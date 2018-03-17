@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Evolve music</title>
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="bundle.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Evolve music</h1>
+    <p>Please tell me how do you like those pieces (1 = best, 5 = worst).</p>
+    <p>Give it some time and we will together breed music of your taste.</p>
+    <form action="/" method="post">
+        <ul class="music-form__rank_list">
+            <% for(let sound = 0; sound < 3; sound++) {%>
+            <li class="rank_list--item">
+                <h2 class="rank_list--heading">Soundtrack <%= sound + 1 %></h2>
+                <p><a id="play-button-<%= sound %>" class="play-button">&#8987; Loading sound&#8230;</a></p>
+                <ul class="music-form__rank-box">
+                <% for(let rank = 1; rank <= 5; rank++) {%>
+                    <% const identifier = `rank-${sound}-${rank}` %>
+                    <li class="rank-box__item">
+                        <% if(rank == 3) {%>
+                            <input type="radio" id="<%= identifier %>"
+                                   checked="checked" name="rank-<%= sound %>" class="rank-checkbox" />
+                        <% } else {%>
+                            <input type="radio" id="<%= identifier %>"
+                                   name="rank-<%= sound %>" class="rank-checkbox" />
+                        <% } %>
+                        <label for="<%= identifier %>"><%= rank %></label>
+                    </li>
+                <% } %>
+                </ul>
+            </li>
+            <% } %>
+        </ul>
+        <input type="submit" value="Send soundtrack ranking" />
+    </form>
+    <div class="footer">
+        <h2>Technical stuff</h2>
+        <p>Created by Petr Wudi as part of MI-MVI course at <a href="https://fit.cvut.cz">FIT ČVUT</a>.</p>
+        <p>You could access <a href="https://https://github.com/wudip/evolve-music" class="github-repo-link">Github
+            repository</a> of the project.</p>
+        <p>There is some technology under the hood created by people who published their work for free to use - namely
+        <a href="https://github.com/grimmdude/MidiPlayerJS">MidiPlayerJS</a>.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "evolve-music-frontend",
+  "description": "Frontend part of music evolution project",
+  "license": "MIT",
+  "repository": "https://github.com/wudip/evolve-music",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "webpack --progress -p --mode production",
+    "dev": "webpack --progress --mode development",
+    "server": "node lib/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --progress --watch"
+  },
+  "author": "Petr Wudi",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.3",
+    "midi-player-js": "^2.0.3",
+    "soundfont-player": "^0.10.6"
+  },
+  "main": "./lib/server.js",
+  "browser": "./lib/browser.js",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "webpack": "^4.1.1"
+  }
+}

@@ -1,0 +1,74 @@
+/* Ranking */
+
+.music-form__rank-box,
+ul.music-form__rank-box {
+    margin: 0;
+}
+
+.rank-box__item {
+    display: inline-block;
+}
+
+input[type="radio"].rank-checkbox {
+    display: none;
+}
+
+input[type="radio"].rank-checkbox+label:hover {
+    background: #EEE;
+}
+
+input[type="radio"].rank-checkbox+label {
+    display: block;
+    padding: 0.5em 1.3em;
+    border: 0.1em #0FA0CE solid;
+    font-weight: normal;
+    border-radius: 0.2em;
+    color: #555;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+input[type="radio"].rank-checkbox:checked+label {
+    background: #0FA0CE;
+    color: white;
+}
+
+.rank_list--item {
+    display: block;
+}
+
+.rank_list--heading {
+    color: #0FA0CE;
+    font-size: 110%;
+    font-weight: 600;
+}
+
+/* Play button */
+
+.play-button {
+    cursor: pointer;
+}
+
+.play-button:hover {
+    color: #000;
+}
+
+/* Footer */
+.footer {
+    background: #EEE;
+    padding: 2.5em 3em 2em 3em;
+    margin-left: -3em;
+}
+
+.footer h2 {
+    font-size: 100%;
+    font-weight: bold;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+}
+
+.footer p {
+    line-height: 1.1;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+}
