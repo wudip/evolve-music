@@ -1,5 +1,5 @@
 var MidiPlayer = require('midi-player-js');
-var Soundfont = require('soundfont-player')
+var Soundfont = require('soundfont-player');
 var ac = new AudioContext()
 
 function initMidiPlayer(instrument, soundId, playerOnload) {
@@ -9,7 +9,7 @@ function initMidiPlayer(instrument, soundId, playerOnload) {
         };
     });
 
-    const url = 'http://localhost:3000/midi-example/' + soundId + '.mid'
+    const url = 'http://localhost:3000/midi-example/' + soundId + '.mid';
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
@@ -20,13 +20,13 @@ function initMidiPlayer(instrument, soundId, playerOnload) {
             midiPlayer.loadArrayBuffer(fileContent);
             playerOnload();
         }
-    }
+    };
     return midiPlayer;
 }
 
 function initSoundPlayer(browserPlayer, soundId) {
     Soundfont.instrument(ac, 'clavinet').then(function(instrument) {
-        const onloadFunc = function() { browserPlayer.playerOnload(soundId) }
+        const onloadFunc = function() { browserPlayer.playerOnload(soundId) };
         browserPlayer.players[soundId] = initMidiPlayer(instrument, soundId, onloadFunc);
     });
 }
@@ -49,7 +49,7 @@ const browserPlayer = {
     },
     getElement: function(soundId) {
         const elemId = `play-button-${soundId}`;
-        return elem = document.getElementById(elemId);
+        return document.getElementById(elemId);
     },
     playerOnload: function(soundId) {
         const elem = this.getElement(soundId);
@@ -58,7 +58,7 @@ const browserPlayer = {
         const elemSoundId = soundId;
         elem.onclick = function() { self.clickPlayButton(elemSoundId) };
     }
-}
+};
 
 window.onload = function() {
     let soundId = 0;
@@ -68,4 +68,4 @@ window.onload = function() {
         initSoundPlayer(browserPlayer, soundId);
         soundId++;
     }
-}
+};

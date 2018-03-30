@@ -20,14 +20,14 @@
                 <p><a id="play-button-<%= sound %>" class="play-button">&#8987; Loading sound&#8230;</a></p>
                 <ul class="music-form__rank-box">
                 <% for(let rank = 1; rank <= 5; rank++) {%>
-                    <% const identifier = `rank-${sound}-${rank}` %>
+                    <% const identifier = `rank_${sound}_${rank}` %>
                     <li class="rank-box__item">
                         <% if(rank == 3) {%>
-                            <input type="radio" id="<%= identifier %>"
-                                   checked="checked" name="rank-<%= sound %>" class="rank-checkbox" />
+                            <input type="radio" id="<%= identifier %>" value="<%= rank %>"
+                                   checked="checked" name="rank_<%= sound %>" class="rank-checkbox" />
                         <% } else {%>
-                            <input type="radio" id="<%= identifier %>"
-                                   name="rank-<%= sound %>" class="rank-checkbox" />
+                            <input type="radio" id="<%= identifier %>" value="<%= rank %>"
+                                   name="rank_<%= sound %>" class="rank-checkbox" />
                         <% } %>
                         <label for="<%= identifier %>"><%= rank %></label>
                     </li>
