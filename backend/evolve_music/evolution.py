@@ -1,5 +1,5 @@
 from soundtrack import Soundtrack
-import base64
+
 
 class Evolution:
     def __init__(self):
@@ -17,12 +17,6 @@ class Evolution:
             individual.set_rank(rank)
 
     def next_generation(self):
-        #print('AHOJ')
-        # print('[', end='')
-        # with open("sample.mid", "rb") as binary_file:
-        #     data = binary_file.read()
-        #     print('"{}"'.format(base64.b64encode(data)), end='')
-        # print(']')
         pass
 
     def individuals_to_rank(self):

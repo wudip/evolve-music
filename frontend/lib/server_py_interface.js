@@ -2,16 +2,17 @@ const child_process = require('child_process');
 
 function PyCommunicator() {
     console.log('Init python process');
-    const path = '../backend/evolve_music/__init__.py';
+    const path = '__init__.py';
     console.log(path);
-    this.process = child_process.spawn('python3', [path]);
-    this.process.stdout.on('data', (data) => {
-        console.log('Vivaldi sucks:');
+    this.process = child_process.spawn('python3', [path], {cwd: '../backend/evolve_music/'});
+    this.process.stderr.on('data', (data) => {
+        console.log('Error:');
         console.log(data.toString());
     });
-    this.process.stdout.on('end', function() {
-        console.log('End:');
+    this.process.on('close', function() {
+        console.log('EXIT');
     });
+    this.received_data = '';
 }
 
 /**
@@ -22,13 +23,22 @@ function PyCommunicator() {
 PyCommunicator.prototype.newGeneration = function (ranks, to_call) {
     console.log('New iteration');
     console.log(JSON.stringify(ranks));
-    console.log('Sent');
+    console.log('Sending');
     this.process.stdout.on('data', (data) => {
-        console.log('Data:');
-        console.log(data.toString());
-        to_call(data.toString());
+        //console.log('Data:');
+        //console.log(data.toString());
+        this.received_data += data.toString();
+        let json_data = undefined;
+        try {
+            json_data = JSON.parse(this.received_data);
+        } catch (e) {
+            return;
+        }
+        this.received_data = '';
+        to_call(json_data);
     });
     this.process.stdin.write(JSON.stringify(ranks) + '\n');
+    console.log('Sent');
 };
 
 /**

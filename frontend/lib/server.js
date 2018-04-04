@@ -1,5 +1,14 @@
 const express = require('express');
 const PyCommunicator = require('./server_py_interface').PyCommunicator;
+const atob = require('atob');
+
+let midiFiles = ['a', 'b', 'c', 'd'];
+
+function saveMidis(soundtracks) {
+    for(let i = 0; i < midiFiles.length; i++) {
+        midiFiles[i] = soundtracks[i];
+    }
+}
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -22,14 +31,32 @@ app.post('/', function(req, res) {
         ranks[soundtrack_id] = req.body[elem_id];
         soundtrack_id++;
     }
-    py_communicator.newGeneration(ranks, function(data) { res.render('index'); });
+
+    py_communicator.newGeneration(ranks, function(data) {
+        saveMidis(data);
+        res.render('index');
+    });
+});
+
+app.get('/midi/*.mid', function (req, res) {
+    const urlPieceis = req.originalUrl.split('/');
+    const fileName = urlPieceis[urlPieceis.length - 1];
+    const fileNamePieces = fileName.split('.');
+    if(fileNamePieces.length !== 2) {
+        console.log('Requesting invalid URL: ' +  req.originalUrl);
+    }
+    const soundtrackIdStr = fileNamePieces[0];
+    const soundtrackId = Number(soundtrackIdStr);
+    console.log(soundtrackId);
+    console.log(midiFiles);
+    if(soundtrackId >= 0 && soundtrackId < midiFiles.length) {
+        const baseSoundtrack = midiFiles[soundtrackId];
+        res.type('audio/midi');
+        res.send(atob(baseSoundtrack));
+    }
 });
 
 port = 3000;
 app.listen(port, function () {
   console.log(`Listening on port ${port}!`)
-});
-
-app.get('/midi/', function (req, res) {
-    res.render('index');
 });
