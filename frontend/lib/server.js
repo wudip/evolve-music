@@ -52,7 +52,8 @@ app.get('/midi/*.mid', function (req, res) {
     if(soundtrackId >= 0 && soundtrackId < midiFiles.length) {
         const baseSoundtrack = midiFiles[soundtrackId];
         res.type('audio/midi');
-        res.send(atob(baseSoundtrack));
+        const arr = atob(baseSoundtrack);
+        res.end(arr, 'binary');
     }
 });
 

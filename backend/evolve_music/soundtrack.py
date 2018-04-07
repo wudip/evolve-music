@@ -11,4 +11,4 @@ class Soundtrack:
     def to_midi(self):
         with open("sample.mid", "rb") as binary_file:
             data = binary_file.read()
-            return format(base64.b64encode(data))
+            return base64.b64encode(data).decode('ascii')
