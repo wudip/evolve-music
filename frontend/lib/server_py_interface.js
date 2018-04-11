@@ -1,6 +1,6 @@
 const child_process = require('child_process');
 
-function PyCommunicator() {
+function PyCommunicator(to_call) {
     console.log('Init python process');
     const path = '__init__.py';
     console.log(path);
@@ -11,6 +11,19 @@ function PyCommunicator() {
     });
     this.process.on('close', function() {
         console.log('EXIT');
+    });
+    this.process.stdout.on('data', (data) => {
+        //console.log('Data:');
+        //console.log(data.toString());
+        this.received_data += data.toString();
+        let json_data = undefined;
+        try {
+            json_data = JSON.parse(this.received_data);
+        } catch (e) {
+            return;
+        }
+        this.received_data = '';
+        to_call(json_data);
     });
     this.received_data = '';
 }

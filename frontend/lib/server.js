@@ -21,7 +21,7 @@ app.get('/', function (req, res) {
   res.render('index');
 });
 
-py_communicator = new PyCommunicator();
+py_communicator = new PyCommunicator(saveMidis);
 
 app.post('/', function(req, res) {
     let soundtrack_id = 0;

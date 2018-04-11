@@ -18,6 +18,12 @@ def main():
     logging.info('Start')
     evolution = Evolution()
     while True:
+        to_rank = evolution.individuals_to_rank()
+        serialized = serialize_individuals(to_rank)
+        json_data = json.dumps(serialized)
+        print(json_data)
+        sys.stdout.flush()
+
         line = sys.stdin.readline()
         logging.info('Loaded:')
         logging.info(line)
@@ -28,13 +34,6 @@ def main():
         logging.info('Rank')
         evolution.rank_generation(ranks)
         evolution.next_generation()
-        to_rank = evolution.individuals_to_rank()
-        serialized = serialize_individuals(to_rank)
-        json_data = json.dumps(serialized)
-        print(json_data)
-        logging.info('Ahoj')
-        # print(evolution.individuals_to_rank())
-        sys.stdout.flush()
     print('HALELUJA')
     return 0
 
