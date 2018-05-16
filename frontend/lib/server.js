@@ -34,13 +34,17 @@ app.post('/', function(req, res) {
 
     py_communicator.newGeneration(ranks, function(data) {
         saveMidis(data);
-        res.render('index');
+        console.log(res.finished);
+        if(!res.finished) {
+            res.render('index');
+        }
     });
 });
 
 app.get('/midi/*.mid', function (req, res) {
     const urlPieceis = req.originalUrl.split('/');
     const fileName = urlPieceis[urlPieceis.length - 1];
+    console.log('Requesting midi ' + fileName);
     const fileNamePieces = fileName.split('.');
     if(fileNamePieces.length !== 2) {
         console.log('Requesting invalid URL: ' +  req.originalUrl);
@@ -55,6 +59,7 @@ app.get('/midi/*.mid', function (req, res) {
         const arr = atob(baseSoundtrack);
         res.end(arr, 'binary');
     }
+    console.log('Request sent');
 });
 
 port = 3000;
