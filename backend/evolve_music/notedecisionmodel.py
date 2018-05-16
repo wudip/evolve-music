@@ -1,60 +1,70 @@
 import tensorflow as tf
 from soundtrack import Soundtrack
-import sys
 import logging
+import numpy as np
+import random
 
 
 class NoteDecisionModel:
-    NOTE_MAX = 8
+    BATCH_SIZE = 1
+    NOTE_MAX = 16
+    HIDDEN_LSTM = 32
+    NUMBER_OF_CELLS = 5
+    INPUT_SIZE = 1
+    OUTPUT_SIZE = 1
+    EPS = 1e-6
+    LEARNING_RATE = 0.01
 
     def __init__(self):
         self.rank_pairs = []
         self.ranks = []
-        self.input_data = tf.placeholder(tf.float32, (None, 2))
-        self.input_labels = tf.placeholder(tf.float32, (None, 1))
-        self.model = self.create_model()
-
-        learning_rate = 0.05
-        batch_loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.input_labels, logits=self.model)
-        self.loss = tf.reduce_mean(batch_loss)
-        self.goal = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.loss)
+        self.series_left = []
+        self.series_right = []
         self.session = None
         self.is_computed = False
 
-    def create_model(self):
-        layer1 = tf.layers.dense(self.input_data, 2, activation=tf.nn.relu)
-        layer2 = tf.layers.dense(layer1, 50, activation=tf.nn.relu)
-        logits = tf.layers.dense(layer2, 1)
+        self.inputs = tf.placeholder(tf.float32, (None, None, self.INPUT_SIZE))
+        self.outputs = tf.placeholder(tf.float32, (None, None, self.OUTPUT_SIZE))
+        lstm_cells = []
+        for _ in range(self.NUMBER_OF_CELLS):
+            lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.HIDDEN_LSTM, state_is_tuple=True)
+            lstm_cells.append(lstm_cell)
+        multi_rnn_cell = tf.nn.rnn_cell.MultiRNNCell(lstm_cells)
+        initial_state = multi_rnn_cell.zero_state(tf.shape(self.inputs)[1], tf.float32)
+        rnn_outputs, rnn_states = tf.nn.dynamic_rnn(multi_rnn_cell, self.inputs, initial_state=initial_state, time_major=True)
 
-        return logits
+        def final_projection(x):
+            return tf.contrib.layers.linear(x, num_outputs=self.OUTPUT_SIZE, activation_fn=tf.nn.sigmoid)
 
-    def get_weights(self, last_note):
+        self.predicted_outputs = tf.map_fn(final_projection, rnn_outputs)
+        self.error = -(self.outputs * tf.log(self.predicted_outputs + self.EPS) + (1.0 - self.outputs)
+                       * tf.log(1.0 - self.predicted_outputs + self.EPS))
+        error = tf.reduce_mean(self.error)
+        self.train_function = tf.train.AdamOptimizer(learning_rate=self.LEARNING_RATE).minimize(error)
+
+    def predict_note(self, last_note):
         if len(self.ranks) == 0:
-            logging.info('No ranks')
-            print('No ranks', file=sys.stderr)
-            return [100 / self.NOTE_MAX] * self.NOTE_MAX
+            logging.info('No ranks, returning random value')
+            return random.randrange(self.NOTE_MAX)
         if not self.is_computed:
             self.compute()
         test_x = []
         for current_note in range(self.NOTE_MAX):
             test_x.append([last_note, current_note])
-        prediction = self.session.run(self.model, feed_dict={
-            self.input_data: test_x
-        })
 
-        weights = []
-        weight_sum = 0
-        for i in range(self.NOTE_MAX):
-            weight = prediction[i][0]
-            if weight < 0:
-                weight = 0
-            weight_sum += weight
-            weights.append(weight)
-        logging.info('weights')
-        logging.info(weights)
-        for i in range(self.NOTE_MAX):
-            weights[i] *= 100 / weight_sum
-        return weights
+        batch_size = 1
+        logging.info('epoch start')
+        x = np.empty((1, batch_size, 1))
+        for i in range(batch_size):
+            x[:, i, 0] = last_note
+
+        prediction = self.session.run(self.predicted_outputs, {
+            self.inputs: x
+        })
+        logging.info('prediction')
+        logging.info(prediction)
+        logging.info(round(prediction[0][0][0]))
+        return int(round(prediction[0][0][0]))
 
     def rank(self, soundtrack: Soundtrack, rank: int):
         self.is_computed = False
@@ -62,21 +72,42 @@ class NoteDecisionModel:
         for i in range(len(notes) - 1):
             n0 = notes[i]
             n1 = notes[i + 1]
-            self.rank_pair(n0, n1, rank)
+            #self.rank_pair(n0, n1, rank)
+            for _ in range(rank):
+                self.series_left.append(n0)
+                self.series_right.append(n1)
 
     def rank_pair(self, note0, note1, rank):
         self.rank_pairs.append([note0, note1])
         self.ranks.append([rank])
 
     def compute(self):
-        self.session = tf.Session()
-        self.session.run(tf.global_variables_initializer())
-        batch_loss = self.session.run([self.loss, self.goal], feed_dict={
-            self.input_data: self.rank_pairs,
-            self.input_labels: self.ranks
-        })
-        logging.info('Batch')
-        print('Batch', file=sys.stderr)
-        print(batch_loss, file=sys.stderr)
-        self.is_computed = True
+        logging.info('init train')
 
+        init = tf.global_variables_initializer()
+        self.session = tf.Session()
+        # For some reason it is our job to do this:
+        self.session.run(init)
+
+        logging.info('start train')
+        for i in range(len(self.series_left)):
+            left = self.series_left[i]
+            right = self.series_right[i]
+
+            logging.info('epoch start')
+            x = np.empty((1, self.BATCH_SIZE, 1))
+            y = np.empty((1, self.BATCH_SIZE, 1))
+
+            for b in range(self.BATCH_SIZE):
+                x[:, b, 0] = left
+                y[:, b, 0] = right
+
+            logging.info('epoch train start')
+            epoch_error = self.session.run([self.error, self.train_function], {
+                self.inputs: x,
+                self.outputs: y,
+            })
+            logging.info('epoch')
+            logging.info(epoch_error)
+        logging.info('trained')
+        self.is_computed = True

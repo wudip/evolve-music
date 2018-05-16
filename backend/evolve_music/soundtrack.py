@@ -8,7 +8,7 @@ import math
 class Soundtrack:
     GENOME_LEN = 5
     NOTE_ARR = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
-    OCTAVE_BASE = 2
+    OCTAVE_BASE = 3
 
     def __init__(self):
         self.notes = []

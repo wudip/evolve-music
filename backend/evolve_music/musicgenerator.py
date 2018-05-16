@@ -14,7 +14,7 @@ class MusicGenerator:
             return
         for soundtrack_id, rank in enumerate(ranks):
             soundtrack = self.soundtracks[soundtrack_id]
-            self.sg.rank(soundtrack, rank)
+            self.sg.rank(soundtrack, int(rank))
 
     def get_music(self):
         self.soundtracks = []
