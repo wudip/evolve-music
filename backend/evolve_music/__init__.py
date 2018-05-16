@@ -2,7 +2,7 @@
 
 import json
 import sys
-from evolution import Evolution
+from musicgenerator import MusicGenerator
 import logging
 
 
@@ -16,9 +16,9 @@ def serialize_individuals(generation):
 def main():
     logging.basicConfig(filename='example.log', level=logging.INFO)
     logging.info('Start')
-    evolution = Evolution()
+    generator = MusicGenerator()
     while True:
-        to_rank = evolution.individuals_to_rank()
+        to_rank = generator.get_music()
         serialized = serialize_individuals(to_rank)
         json_data = json.dumps(serialized)
         print(json_data)
@@ -32,9 +32,8 @@ def main():
             break
         ranks = json.loads(line)
         logging.info('Rank')
-        evolution.rank_generation(ranks)
-        evolution.next_generation()
-    print('HALELUJA')
+        generator.rank_generation(ranks)
+    print('Killed')
     return 0
 
 
