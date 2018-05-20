@@ -7,6 +7,7 @@
   "scripts": {
     "build": "webpack --progress -p --mode production",
     "dev": "webpack --progress --mode development",
+    "postinstall": "npm run build",
     "server": "node lib/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --progress --watch"
