@@ -9,7 +9,7 @@ function initMidiPlayer(instrument, soundId, playerOnload) {
         };
     });
 
-    const url = 'http://localhost:3000/midi/' + soundId + '.mid';
+    const url = 'midi/' + soundId + '.mid';
     const request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
