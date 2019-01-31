@@ -1,8 +1,6 @@
 import tensorflow as tf
-from soundtrack import Soundtrack
 import logging
 import numpy as np
-import random
 
 
 class NoteDecisionModel:
@@ -16,12 +14,9 @@ class NoteDecisionModel:
     LEARNING_RATE = 0.01
 
     def __init__(self):
-        self.rank_pairs = []
-        self.ranks = []
         self.series_left = []
         self.series_right = []
         self.session = None
-        self.is_computed = False
 
         self.inputs = tf.placeholder(tf.float32, (None, None, self.INPUT_SIZE))
         self.outputs = tf.placeholder(tf.float32, (None, None, self.OUTPUT_SIZE))
@@ -43,11 +38,6 @@ class NoteDecisionModel:
         self.train_function = tf.train.AdamOptimizer(learning_rate=self.LEARNING_RATE).minimize(error)
 
     def predict_note(self, last_note):
-        if len(self.ranks) == 0:
-            logging.info('No ranks, returning random value')
-            return random.randrange(self.NOTE_MAX)
-        if not self.is_computed:
-            self.compute()
         test_x = []
         for current_note in range(self.NOTE_MAX):
             test_x.append([last_note, current_note])
@@ -66,22 +56,7 @@ class NoteDecisionModel:
         logging.info(round(prediction[0][0][0]))
         return int(round(prediction[0][0][0]))
 
-    def rank(self, soundtrack: Soundtrack, rank: int):
-        self.is_computed = False
-        notes = soundtrack.get_pure_note_list()
-        for i in range(len(notes) - 1):
-            n0 = notes[i]
-            n1 = notes[i + 1]
-            #self.rank_pair(n0, n1, rank)
-            for _ in range(rank):
-                self.series_left.append(n0)
-                self.series_right.append(n1)
-
-    def rank_pair(self, note0, note1, rank):
-        self.rank_pairs.append([note0, note1])
-        self.ranks.append([rank])
-
-    def compute(self):
+    def train(self, series_left, series_right):
         logging.info('init train')
 
         init = tf.global_variables_initializer()
@@ -90,9 +65,9 @@ class NoteDecisionModel:
         self.session.run(init)
 
         logging.info('start train')
-        for i in range(len(self.series_left)):
-            left = self.series_left[i]
-            right = self.series_right[i]
+        for i in range(len(series_left)):
+            left = series_left[i]
+            right = series_right[i]
 
             logging.info('epoch start')
             x = np.empty((1, self.BATCH_SIZE, 1))
@@ -110,4 +85,3 @@ class NoteDecisionModel:
             logging.info('epoch')
             logging.info(epoch_error)
         logging.info('trained')
-        self.is_computed = True
