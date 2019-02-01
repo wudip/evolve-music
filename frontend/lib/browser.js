@@ -6,7 +6,10 @@ function initMidiPlayer(instrument, soundId, playerOnload) {
     const midiPlayer = new MidiPlayer.Player(function(event) {
         if(event.name == 'Note on' && event.velocity > 0) {
             instrument.play(event.noteName, ac.currentTime, { gain: event.velocity/100 });
-        };
+        }
+        else if(event.name == 'Whatever') {
+
+        }
     });
 
     const url = 'midi/' + soundId + '.mid';
@@ -57,6 +60,9 @@ const browserPlayer = {
         const self = this;
         const elemSoundId = soundId;
         elem.onclick = function() { self.clickPlayButton(elemSoundId) };
+    },
+    onEof: function(soundId) {
+        
     }
 };
 

@@ -1,7 +1,6 @@
 import base64
 from EasyMIDI import EasyMIDI, Track, Note
 import io
-import sys
 import math
 
 

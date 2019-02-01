@@ -12,8 +12,10 @@ class NoteDecider:
         self.model = NoteDecisionModel()
         self.series_left = []
         self.series_right = []
+        self.n_rounds = 0
 
     def rank(self, soundtrack: Soundtrack, rank: int):
+        self.n_rounds += 1
         self.is_computed = False
         notes = soundtrack.get_pure_note_list()
         for i in range(len(notes) - 1):
@@ -25,10 +27,14 @@ class NoteDecider:
                 self.series_right.append(note_next)
 
     def predict_note(self, last_note):
+        model_confidency = 1 - 1 / (self.n_rounds + 1)
+        if random.random < model_confidency:
+            logging.info('No ranks, returning random value')
+            return random.randrange(self.NOTE_MAX)
         if len(self.series_left) == 0:
             logging.info('No ranks, returning random value')
             return random.randrange(self.NOTE_MAX)
-        if self.is_computed:
+        if not self.is_computed:
             self.model.train(self.series_left, self.series_right)
             self.is_computed = True
-        self.model.predict_note(last_note)
+        return self.model.predict_note(last_note)
